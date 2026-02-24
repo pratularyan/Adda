@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adda — Scene Kya Hai?</title>
+  <meta name="description" content="Post what you're upto. Find who's down. Delhi ka naya adda.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=Noto+Sans+Devanagari:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { cursor: none; }
+    .cursor{width:12px;height:12px;background:var(--saffron);border-radius:50%;position:fixed;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:width 0.2s,height 0.2s;mix-blend-mode:multiply;}
+    .cursor-follower{width:36px;height:36px;border:2px solid var(--saffron);border-radius:50%;position:fixed;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);opacity:0.5;}
+    nav.main-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:20px 48px;}
+    .nav-logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;color:var(--dark);letter-spacing:2px;}
+    .nav-logo span{color:var(--saffron);}
+    .nav-cta{background:var(--dark);color:var(--cream);border:none;padding:10px 24px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.85rem;letter-spacing:1px;cursor:none;transition:background 0.2s,transform 0.2s;}
+    .nav-cta:hover{background:var(--saffron);transform:translateY(-2px);}
+    .hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden;}
+    .hero-left{background:var(--deep-teal);padding:140px 48px 80px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
+    .hero-left::after{content:'अड्डा';font-family:'Noto Sans Devanagari',sans-serif;font-size:18rem;font-weight:700;color:rgba(255,255,255,0.04);position:absolute;bottom:-40px;left:-20px;line-height:1;pointer-events:none;}
+    .hero-eyebrow{font-size:0.75rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:var(--saffron);margin-bottom:24px;opacity:0;animation:fadeUp 0.6s ease 0.2s forwards;}
+    .hero-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(4rem,7vw,7rem);line-height:0.95;color:var(--cream);margin-bottom:32px;opacity:0;animation:fadeUp 0.6s ease 0.4s forwards;}
+    .hero-title .a1{color:var(--saffron);}.hero-title .a2{color:var(--soft-yellow);}
+    .hero-sub{font-size:1.1rem;color:rgba(255,248,238,0.7);max-width:380px;line-height:1.7;margin-bottom:48px;opacity:0;animation:fadeUp 0.6s ease 0.6s forwards;}
+    .hero-actions{display:flex;gap:16px;align-items:center;opacity:0;animation:fadeUp 0.6s ease 0.8s forwards;}
+    .btn-primary{background:var(--saffron);color:white;border:none;padding:16px 36px;font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;cursor:none;transition:transform 0.2s,box-shadow 0.2s;}
+    .btn-primary:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(255,107,26,0.4);}
+    .btn-secondary{color:var(--cream);font-family:'Syne',sans-serif;font-weight:600;font-size:0.9rem;border-bottom:1px solid rgba(255,248,238,0.4);cursor:none;padding-bottom:2px;transition:color 0.2s,border-color 0.2s;text-decoration:none;}
+    .btn-secondary:hover{color:var(--saffron);border-color:var(--saffron);}
+    .hero-right{background:var(--cream);padding:140px 48px 80px;display:flex;flex-direction:column;justify-content:center;position:relative;}
+    .scene-cards{display:flex;flex-direction:column;gap:16px;opacity:0;animation:fadeUp 0.6s ease 1s forwards;}
+    .sc{background:white;border:1.5px solid rgba(0,0,0,0.08);padding:20px 24px;transition:transform 0.2s,box-shadow 0.2s;box-shadow:4px 4px 0 rgba(0,0,0,0.06);}
+    .sc:hover{transform:translate(-3px,-3px);box-shadow:7px 7px 0 rgba(255,107,26,0.15);}
+    .sc:nth-child(2){margin-left:24px;}.sc:nth-child(3){margin-left:8px;}
+    .ch{display:flex;align-items:center;gap:12px;margin-bottom:12px;}
+    .ca{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:0.85rem;color:white;}
+    .ct{font-size:0.95rem;line-height:1.5;color:#333;margin-bottom:14px;}
+    .cf{display:flex;gap:8px;align-items:center;}
+    .ctag{font-size:0.7rem;font-weight:700;padding:4px 10px;background:var(--cream);border:1px solid rgba(0,0,0,0.1);color:#666;}
+    .cdwn{margin-left:auto;background:var(--saffron);color:white;border:none;padding:6px 16px;font-family:'Syne',sans-serif;font-weight:700;font-size:0.78rem;cursor:none;}
+    .ticker{background:var(--dark);color:var(--cream);padding:14px 0;overflow:hidden;white-space:nowrap;}
+    .ticker-inner{display:inline-block;animation:ticker 30s linear infinite;font-family:'Bebas Neue',sans-serif;font-size:1.1rem;letter-spacing:2px;}
+    .ticker-inner span{color:var(--saffron);margin:0 16px;}
+    .how{padding:120px 48px;background:var(--cream);}
+    .stl{font-family:'Bebas Neue',sans-serif;font-size:clamp(3rem,5vw,5rem);line-height:1;color:var(--dark);margin-bottom:80px;}
+    .stl em{color:var(--saffron);font-style:normal;}
+    .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;}
+    .step{background:white;padding:48px 36px;border:1.5px solid rgba(0,0,0,0.06);transition:transform 0.2s;}
+    .step:hover{transform:translateY(-6px);}
+    .sn{font-family:'Bebas Neue',sans-serif;font-size:5rem;line-height:1;color:rgba(0,0,0,0.06);margin-bottom:24px;display:block;}
+    .si{font-size:2.5rem;margin-bottom:20px;display:block;}
+    .sti{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:1px;margin-bottom:12px;}
+    .step:first-child{border-top:4px solid var(--saffron);}
+    .step:nth-child(2){border-top:4px solid var(--deep-teal);}
+    .step:nth-child(3){border-top:4px solid var(--hot-pink);}
+    .vibes{background:var(--deep-teal);padding:120px 48px;}
+    .vibe-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-top:60px;}
+    .vp{background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.12);padding:20px 16px;text-align:center;transition:all 0.2s;cursor:none;}
+    .vp:hover{background:var(--saffron);border-color:var(--saffron);transform:translateY(-4px);}
+    .ve{font-size:2rem;display:block;margin-bottom:10px;}
+    .vn{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1.5px;color:var(--cream);}
+    .stats-row{background:var(--saffron);padding:80px 48px;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;}
+    .stat{padding:32px;text-align:center;}
+    .snum{font-family:'Bebas Neue',sans-serif;font-size:4rem;color:white;line-height:1;display:block;}
+    .slbl{font-size:0.85rem;font-weight:600;color:rgba(255,255,255,0.8);letter-spacing:1px;margin-top:8px;display:block;}
+    .waitlist-sec{background:var(--dark);padding:120px 48px;text-align:center;position:relative;overflow:hidden;}
+    .waitlist-sec::before{content:'ADDA';font-family:'Bebas Neue',sans-serif;font-size:30vw;color:rgba(255,255,255,0.02);position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;white-space:nowrap;}
+    .wform{display:flex;max-width:500px;margin:0 auto 16px;position:relative;z-index:1;}
+    .winput{flex:1;background:rgba(255,255,255,0.07);border:1.5px solid rgba(255,255,255,0.15);border-right:none;padding:16px 24px;color:var(--cream);font-family:'Syne',sans-serif;font-size:0.95rem;outline:none;transition:border-color 0.2s;}
+    .winput::placeholder{color:rgba(255,255,255,0.3);}
+    .winput:focus{border-color:var(--saffron);}
+    .wbtn{background:var(--saffron);border:none;padding:16px 28px;color:white;font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem;cursor:none;white-space:nowrap;}
+    .wbtn:hover{background:#e55a0f;}
+    footer{background:var(--dark);border-top:1px solid rgba(255,255,255,0.06);padding:40px 48px;display:flex;align-items:center;justify-content:space-between;}
+    .fl{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--cream);letter-spacing:2px;}
+    .fl span{color:var(--saffron);}
+    .reveal{opacity:0;transform:translateY(32px);transition:opacity 0.6s ease,transform 0.6s ease;}
+    .reveal.visible{opacity:1;transform:translateY(0);}
+    @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+    @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+    .float{animation:float 3s ease-in-out infinite;}
+    @media(max-width:900px){.hero{grid-template-columns:1fr;}.steps{grid-template-columns:1fr;}.vibe-grid{grid-template-columns:repeat(3,1fr);}.stats-row{grid-template-columns:repeat(2,1fr);}}
+  </style>
+</head>
+<body>
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-follower" id="follower"></div>
+
+  <nav class="main-nav">
+    <div class="nav-logo">Add<span>a</span></div>
+    <button class="nav-cta" onclick="document.querySelector('.waitlist-sec').scrollIntoView({behavior:'smooth'})">Join Waitlist</button>
+  </nav>
+
+  <section class="hero">
+    <div class="hero-left">
+      <p class="hero-eyebrow">Delhi ka naya adda</p>
+      <h1 class="hero-title">Scene<br><span class="a1">Kya</span><br><span class="a2">Hai?</span></h1>
+      <p class="hero-sub">Post what you're upto. Find who's down. No planning, no group chats, no drama — just real people, real plans, right now.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="window.location.href='feed.html'">Scene Dekho →</button>
+        <a class="btn-secondary" href="#how">Kaise kaam karta hai?</a>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div style="position:absolute;top:100px;right:48px;display:flex;align-items:center;gap:6px;opacity:0;animation:fadeUp 0.4s ease 1.2s forwards;">
+        <span class="live-dot"></span><span class="live-text" id="heroLiveCount">LIVE NOW</span>
+      </div>
+      <div class="scene-cards">
+        <div class="sc float" style="animation-delay:0s;">
+          <div class="ch"><div class="ca av-0">RK</div><div><div style="font-weight:700;font-size:0.9rem;">Rahul K.</div><div style="font-size:0.75rem;color:#888;">Hansraj College</div></div></div>
+          <p class="ct">Karan Aujla concert this Friday — got 1 extra ticket. Koi hai jo join karna chahta ho? 🔥</p>
+          <div class="cf"><span class="ctag">🎵 CONCERT</span><span class="ctag">Friday 8PM</span><button class="cdwn">I'm Down →</button></div>
+        </div>
+        <div class="sc float" style="animation-delay:1s;">
+          <div class="ch"><div class="ca av-1">PV</div><div><div style="font-weight:700;font-size:0.9rem;">Priya V.</div><div style="font-size:0.75rem;color:#888;">Miranda House</div></div></div>
+          <p class="ct">We're 3 girls headed to Kamla Nagar for chai & momos. Koi bhi join kar sakti hai ☕</p>
+          <div class="cf"><span class="ctag">☕ CHILL</span><span class="ctag">Today 5PM</span><button class="cdwn">I'm Down →</button></div>
+        </div>
+        <div class="sc float" style="animation-delay:2s;">
+          <div class="ch"><div class="ca av-2">AS</div><div><div style="font-weight:700;font-size:0.9rem;">Arjun S.</div><div style="font-size:0.75rem;color:#888;">SRCC</div></div></div>
+          <p class="ct">Solo at café in CP, raining outside. Koi aana chahega? 🌧️</p>
+          <div class="cf"><span class="ctag">🍕 FOOD</span><span class="ctag">Right now</span><button class="cdwn">I'm Down →</button></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="ticker"><div class="ticker-inner">ADDA <span>●</span> SCENE KYA HAI <span>●</span> NORTH CAMPUS <span>●</span> KAMLA NAGAR <span>●</span> HAUZ KHAS <span>●</span> CONNAUGHT PLACE <span>●</span> DELHI UNIVERSITY <span>●</span> CHAI PE CHARCHA <span>●</span> KOI HAI KYA <span>●</span> ADDA <span>●</span> SCENE KYA HAI <span>●</span> NORTH CAMPUS <span>●</span> KAMLA NAGAR <span>●</span> HAUZ KHAS <span>●</span> CONNAUGHT PLACE <span>●</span> DELHI UNIVERSITY <span>●</span> CHAI PE CHARCHA <span>●</span> KOI HAI KYA <span>●</span></div></div>
+
+  <section class="how" id="how">
+    <span class="section-label reveal">Seedha Simple</span>
+    <h2 class="stl reveal">Teen <em>steps.</em><br>Bas.</h2>
+    <div class="steps">
+      <div class="step reveal"><span class="sn">01</span><span class="si">📍</span><div class="sti">Post Your Scene</div><p style="font-size:0.95rem;line-height:1.7;color:#666;">Chai pe ja raha hai? Concert ke liye ticket hai? Post kar. 100 characters. Done.</p></div>
+      <div class="step reveal" style="transition-delay:0.15s"><span class="sn">02</span><span class="si">👀</span><div class="sti">Dekh Kaun Hai Down</div><p style="font-size:0.95rem;line-height:1.7;color:#666;">Nearby log tumhara scene dekhte hain. Jo down hai, ek tap karte hain.</p></div>
+      <div class="step reveal" style="transition-delay:0.3s"><span class="sn">03</span><span class="si">🤝</span><div class="sti">Nikal Yaar</div><p style="font-size:0.95rem;line-height:1.7;color:#666;">Quick group chat banta hai, confirm karo, nikal. 24 hours mein expire — stay fresh.</p></div>
+    </div>
+  </section>
+
+  <section class="vibes">
+    <span class="section-label reveal" style="color:var(--soft-yellow)">Har Scene Ka Apna Vibe</span>
+    <h2 class="stl reveal" style="color:var(--cream)">Kya <em style="color:var(--soft-yellow)">scene</em> hai aaj?</h2>
+    <div class="vibe-grid reveal">
+      <div class="vp"><span class="ve">☕</span><span class="vn">Chill</span></div>
+      <div class="vp"><span class="ve">🎵</span><span class="vn">Concert</span></div>
+      <div class="vp"><span class="ve">📚</span><span class="vn">Study</span></div>
+      <div class="vp"><span class="ve">🍕</span><span class="vn">Food</span></div>
+      <div class="vp"><span class="ve">🏏</span><span class="vn">Sports</span></div>
+      <div class="vp"><span class="ve">🌙</span><span class="vn">Night Out</span></div>
+    </div>
+  </section>
+
+  <div class="stats-row">
+    <div class="stat reveal"><span class="snum">90+</span><span class="slbl">DU Colleges</span></div>
+    <div class="stat reveal" style="transition-delay:0.1s"><span class="snum">3L+</span><span class="slbl">Students North Campus</span></div>
+    <div class="stat reveal" style="transition-delay:0.2s"><span class="snum">0₹</span><span class="slbl">Forever Free</span></div>
+    <div class="stat reveal" style="transition-delay:0.3s"><span class="snum">24H</span><span class="slbl">Scene Expiry</span></div>
+  </div>
+
+  <section class="waitlist-sec">
+    <span class="section-label" style="color:var(--soft-yellow);position:relative;z-index:1;">Abhi Nahi Toh Kab</span>
+    <h2 class="stl" style="color:var(--cream);margin-bottom:16px;position:relative;z-index:1;">Pehle <em>100</em><br>Mein Ho Ja.</h2>
+    <p style="font-size:1.1rem;color:rgba(255,248,238,0.6);max-width:480px;margin:0 auto 48px;line-height:1.7;position:relative;z-index:1;">Founding batch ke liye early access. Tu pehle hoga — aur pehle waale hi legend bante hain.</p>
+    <div class="wform">
+      <input type="email" class="winput" placeholder="tera@email.com" id="emailInput" />
+      <button class="wbtn" onclick="handleJoin()">Scene Mein Aa →</button>
+    </div>
+    <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);position:relative;z-index:1;">No spam. Sirf launch update. Promise.</p>
+    <p style="display:none;color:#22c55e;font-weight:700;font-size:1rem;margin-top:16px;position:relative;z-index:1;" id="successMsg">✓ Ho gaya! Founding batch mein add kar diya tujhe. 🔥</p>
+  </section>
+
+  <footer>
+    <div class="fl">Add<span>a</span></div>
+    <div style="display:flex;gap:20px;">
+      <a href="feed.html" style="font-size:0.8rem;color:rgba(255,255,255,0.3);text-decoration:none;">Feed</a>
+      <a href="admin.html" style="font-size:0.8rem;color:rgba(255,255,255,0.3);text-decoration:none;">Admin</a>
+    </div>
+    <p style="font-size:0.8rem;color:rgba(255,255,255,0.3);">Made with chai ☕ for Delhi's finest. © 2025 Adda</p>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/app.js"></script>
+  <script>
+    const cur=document.getElementById('cursor'),fol=document.getElementById('follower');
+    let mx=0,my=0,fx=0,fy=0;
+    document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px';});
+    (function a(){fx+=(mx-fx)*0.12;fy+=(my-fy)*0.12;fol.style.left=fx+'px';fol.style.top=fy+'px';requestAnimationFrame(a);})();
+
+    const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:0.15});
+    document.querySelectorAll('.reveal').forEach(r=>obs.observe(r));
+
+    document.getElementById('heroLiveCount').textContent=DB.getScenes().length+' SCENES LIVE';
+
+    document.querySelectorAll('.cdwn').forEach(b=>b.addEventListener('click',function(){this.textContent='✓ Down!';this.style.background='#22c55e';}));
+
+    function handleJoin(){
+      const e=document.getElementById('emailInput').value;
+      if(!e||!e.includes('@')){document.getElementById('emailInput').style.borderColor='var(--hot-pink)';return;}
+      DB.addToWaitlist(e);
+      document.querySelector('.wbtn').textContent='✓ Done!';
+      document.querySelector('.wbtn').style.background='#22c55e';
+      document.getElementById('successMsg').style.display='block';
+      document.getElementById('emailInput').disabled=true;
+    }
+    document.getElementById('emailInput').addEventListener('keydown',e=>{if(e.key==='Enter')handleJoin();});
+  </script>
+</body>
+</html>

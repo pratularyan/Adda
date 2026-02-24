@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adda — Notifications</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .page-wrap { max-width: 680px; margin: 0 auto; padding: 32px 24px; }
+    .page-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; }
+    .page-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.2rem; letter-spacing: 1px; color: var(--dark); }
+    .mark-all-btn {
+      background: none; border: 1.5px solid var(--border);
+      padding: 7px 16px; font-family: 'Syne', sans-serif; font-weight: 700;
+      font-size: 0.78rem; cursor: pointer; color: #888; transition: all 0.15s; letter-spacing: 0.5px;
+    }
+    .mark-all-btn:hover { border-color: var(--saffron); color: var(--saffron); }
+
+    /* NOTIF ITEM */
+    .notif-item {
+      background: white; border: 1.5px solid var(--border);
+      padding: 18px 20px; margin-bottom: 8px;
+      display: flex; gap: 14px; align-items: flex-start;
+      transition: transform 0.15s, box-shadow 0.15s;
+      animation: slideIn 0.3s ease; cursor: pointer;
+      text-decoration: none; color: inherit;
+    }
+    .notif-item:hover { transform: translateX(4px); box-shadow: -4px 0 0 var(--saffron); }
+    .notif-item.unread { border-left: 4px solid var(--saffron); }
+    .notif-item.unread .notif-text { font-weight: 700; }
+    .notif-icon {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .icon-down { background: rgba(255,107,26,0.12); }
+    .icon-post { background: rgba(34,197,94,0.12); }
+    .icon-join { background: rgba(99,102,241,0.12); }
+    .icon-system { background: rgba(0,0,0,0.06); }
+    .notif-body { flex: 1; }
+    .notif-text { font-size: 0.9rem; color: #333; line-height: 1.5; }
+    .notif-time { font-size: 0.72rem; color: #bbb; font-weight: 600; margin-top: 4px; }
+    .notif-scene-preview {
+      font-size: 0.78rem; color: #999; margin-top: 6px;
+      padding: 8px 12px; background: #fafafa; border-left: 3px solid var(--saffron);
+      font-style: italic;
+    }
+    .unread-dot {
+      width: 8px; height: 8px; background: var(--saffron);
+      border-radius: 50%; margin-top: 6px; flex-shrink: 0;
+    }
+
+    /* FILTER TABS */
+    .filter-tabs { display: flex; gap: 0; margin-bottom: 20px; border-bottom: 2px solid var(--border); }
+    .ftab {
+      padding: 10px 18px; background: none; border: none;
+      font-family: 'Syne', sans-serif; font-weight: 700; font-size: 0.82rem;
+      cursor: pointer; color: #aaa; transition: color 0.15s; position: relative; letter-spacing: 0.5px;
+    }
+    .ftab.active { color: var(--dark); }
+    .ftab.active::after { content:''; position:absolute; bottom:-2px; left:0; right:0; height:2px; background:var(--saffron); }
+    .ftab:hover { color: var(--dark); }
+    .ftab-count {
+      display: inline-block; background: var(--saffron); color: white;
+      font-size: 0.65rem; padding: 1px 6px; border-radius: 100px;
+      margin-left: 4px; font-weight: 800; vertical-align: middle;
+    }
+
+    /* LOGGED OUT */
+    .logged-out { text-align: center; padding: 80px 24px; }
+    .logged-out-emoji { font-size: 3.5rem; display: block; margin-bottom: 16px; }
+    .logged-out-title { font-family: 'Bebas Neue', sans-serif; font-size: 2.5rem; color: var(--dark); margin-bottom: 12px; }
+  </style>
+</head>
+<body>
+
+  <nav class="topbar">
+    <a href="index.html" class="topbar-logo">Add<span>a</span></a>
+    <div class="topbar-nav">
+      <a href="feed.html" class="nav-link">Feed</a>
+      <a href="notifications.html" class="nav-link active">Notifications</a>
+      <a href="profile.html" class="nav-link">Profile</a>
+    </div>
+    <button class="post-btn" onclick="openPostModal()">+ Scene Banao</button>
+  </nav>
+
+  <div class="page-wrap">
+    <div id="pageBody"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/app.js"></script>
+  <script>
+    let currentUser = DB.getUser();
+
+    // =====================
+    // SEED NOTIFICATIONS
+    // =====================
+    function seedNotifications() {
+      const existing = DB.getNotifications();
+      if (existing.length > 0) return;
+      const seeds = [
+        { type:'down', icon:'🔥', iconClass:'icon-down', text:'Rohan K. tere scene pe down hua!', preview:'Chai scene in Kamla Nagar...', read:false, timestamp: Date.now()-1000*60*5 },
+        { type:'down', icon:'🔥', iconClass:'icon-down', text:'Priya V. aur 2 aur log tere scene pe down hue!', preview:'Library study session...', read:false, timestamp: Date.now()-1000*60*20 },
+        { type:'join', icon:'✓', iconClass:'icon-join', text:'Tu Arjun ke scene mein join hua', preview:'Solo at café in CP...', read:true, timestamp: Date.now()-1000*60*60 },
+        { type:'post', icon:'🎉', iconClass:'icon-post', text:'Tera scene live ho gaya — 24 hours tak active rahega', preview:'', read:true, timestamp: Date.now()-1000*60*90 },
+        { type:'system', icon:'🌟', iconClass:'icon-system', text:'Tu founding batch mein hai! Pehle 100 users mein se ek hai tu.', preview:'', read:true, timestamp: Date.now()-1000*60*60*3 },
+        { type:'down', icon:'🔥', iconClass:'icon-down', text:'Kabir S. tere scene pe down hua', preview:'Sports scene at North Campus...', read:true, timestamp: Date.now()-1000*60*60*5 },
+      ];
+      seeds.forEach(s => {
+        s.id = Utils.id();
+      });
+      DB.saveNotifications(seeds);
+    }
+
+    // =====================
+    // RENDER
+    // =====================
+    let activeFilter = 'all';
+
+    function render() {
+      if (!currentUser) {
+        document.getElementById('pageBody').innerHTML = `
+          <div class="logged-out">
+            <span class="logged-out-emoji">🔔</span>
+            <div class="logged-out-title">Login Karo</div>
+            <p style="color:#888;margin-bottom:24px;">Notifications dekhne ke liye login karna padega.</p>
+            <button class="post-btn" style="padding:12px 32px;" onclick="openLoginModal()">Login / Signup</button>
+          </div>`;
+        return;
+      }
+
+      seedNotifications();
+      const allNotifs = DB.getNotifications();
+      const unreadCount = allNotifs.filter(n => !n.read).length;
+
+      let filtered = allNotifs;
+      if (activeFilter === 'unread') filtered = allNotifs.filter(n => !n.read);
+      if (activeFilter === 'down') filtered = allNotifs.filter(n => n.type === 'down');
+
+      document.getElementById('pageBody').innerHTML = `
+        <div class="page-header">
+          <h1 class="page-title">Notifications</h1>
+          ${unreadCount > 0 ? `<button class="mark-all-btn" onclick="markAllRead()">Sab Read Karo</button>` : ''}
+        </div>
+        <div class="filter-tabs">
+          <button class="ftab ${activeFilter==='all'?'active':''}" onclick="setFilter('all')">
+            Sab Kuch ${allNotifs.length > 0 ? `<span class="ftab-count">${allNotifs.length}</span>` : ''}
+          </button>
+          <button class="ftab ${activeFilter==='unread'?'active':''}" onclick="setFilter('unread')">
+            Unread ${unreadCount > 0 ? `<span class="ftab-count">${unreadCount}</span>` : ''}
+          </button>
+          <button class="ftab ${activeFilter==='down'?'active':''}" onclick="setFilter('down')">
+            Down 🔥
+          </button>
+        </div>
+        <div id="notifList">
+          ${filtered.length === 0 ? `
+            <div class="empty-state">
+              <span class="empty-emoji">📭</span>
+              <div class="empty-title">Koi Notification Nahi</div>
+              <p class="empty-sub">Scene banao — phir notifications aayenge.</p>
+            </div>` :
+            filtered.map(n => `
+              <a class="notif-item ${!n.read ? 'unread' : ''}" onclick="markRead('${n.id}')" href="${n.sceneId ? 'scene.html?id='+n.sceneId : '#'}">
+                <div class="notif-icon ${n.iconClass || 'icon-system'}">${n.icon || '🔔'}</div>
+                <div class="notif-body">
+                  <div class="notif-text">${n.text}</div>
+                  ${n.preview ? `<div class="notif-scene-preview">"${n.preview}"</div>` : ''}
+                  <div class="notif-time">${Utils.timeAgo(n.timestamp)}</div>
+                </div>
+                ${!n.read ? '<div class="unread-dot"></div>' : ''}
+              </a>
+            `).join('')
+          }
+        </div>
+      `;
+    }
+
+    function setFilter(f) {
+      activeFilter = f;
+      render();
+    }
+
+    function markRead(id) {
+      const notifs = DB.getNotifications();
+      const n = notifs.find(n => n.id === id);
+      if (n) { n.read = true; DB.saveNotifications(notifs); }
+      updateNotifBadge();
+    }
+
+    function markAllRead() {
+      const notifs = DB.getNotifications().map(n => ({ ...n, read: true }));
+      DB.saveNotifications(notifs);
+      updateNotifBadge();
+      render();
+      showToast('Sab read mark ho gaya ✓', 'success');
+    }
+
+    function onLoginComplete(user) {
+      currentUser = user;
+      setTimeout(() => render(), 400);
+    }
+    function onScenePosted() { window.location.href = 'feed.html'; }
+
+    render();
+  </script>
+</body>
+</html>

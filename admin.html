@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Adda — Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Syne:wght@400;600;700;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    body { background: #0D1117; color: var(--cream); }
+
+    /* ADMIN NAV */
+    .admin-nav {
+      background: #0a0e14; border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 28px; height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .admin-logo { font-family: 'Bebas Neue', sans-serif; font-size: 1.4rem; letter-spacing: 3px; color: var(--cream); }
+    .admin-logo span { color: var(--saffron); }
+    .admin-badge {
+      background: var(--hot-pink); color: white; font-size: 0.65rem;
+      font-weight: 800; padding: 2px 8px; letter-spacing: 1px; vertical-align: middle;
+    }
+    .back-to-site {
+      color: rgba(255,248,238,0.4); font-size: 0.8rem; font-weight: 700;
+      text-decoration: none; transition: color 0.15s; letter-spacing: 0.5px;
+    }
+    .back-to-site:hover { color: var(--saffron); }
+
+    /* LAYOUT */
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; min-height: calc(100vh - 58px); }
+
+    /* SIDEBAR */
+    .admin-sidebar {
+      background: #0a0e14; border-right: 1px solid rgba(255,255,255,0.06);
+      padding: 24px 0;
+    }
+    .sidebar-section { margin-bottom: 8px; }
+    .sidebar-section-label {
+      font-size: 0.62rem; font-weight: 700; letter-spacing: 3px; text-transform: uppercase;
+      color: rgba(255,248,238,0.2); padding: 0 20px; margin-bottom: 8px; display: block;
+    }
+    .sidebar-btn {
+      display: flex; align-items: center; gap: 10px; width: 100%;
+      background: none; border: none; padding: 10px 20px;
+      font-family: 'Syne', sans-serif; font-weight: 600; font-size: 0.85rem;
+      cursor: pointer; color: rgba(255,248,238,0.5); transition: all 0.15s;
+      text-align: left; letter-spacing: 0.3px;
+    }
+    .sidebar-btn:hover { color: var(--cream); background: rgba(255,255,255,0.04); }
+    .sidebar-btn.active { color: var(--saffron); background: rgba(255,107,26,0.08); border-right: 2px solid var(--saffron); }
+    .sidebar-btn .icon { font-size: 1rem; width: 20px; text-align: center; }
+
+    /* MAIN */
+    .admin-main { padding: 32px; overflow-y: auto; }
+
+    /* STATS GRID */
+    .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .stat-card {
+      background: #161b22; border: 1px solid rgba(255,255,255,0.08);
+      padding: 20px; transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: var(--saffron); }
+    .stat-card-num { font-family: 'Bebas Neue', sans-serif; font-size: 2.8rem; line-height: 1; display: block; }
+    .stat-card-label { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; color: rgba(255,248,238,0.4); text-transform: uppercase; margin-top: 4px; display: block; }
+    .stat-card-change { font-size: 0.75rem; font-weight: 700; margin-top: 8px; }
+    .change-up { color: #22c55e; }
+    .change-down { color: var(--hot-pink); }
+
+    /* SECTION */
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+    .section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+    .section-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; letter-spacing: 2px; color: var(--cream); }
+    .section-subtitle { font-size: 0.82rem; color: rgba(255,248,238,0.4); margin-top: 2px; }
+
+    /* TABLE */
+    .admin-table-wrap { background: #161b22; border: 1px solid rgba(255,255,255,0.08); overflow: hidden; }
+    .admin-table { width: 100%; border-collapse: collapse; }
+    .admin-table th {
+      background: #0a0e14; padding: 12px 16px; text-align: left;
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      color: rgba(255,248,238,0.3); border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+    .admin-table td {
+      padding: 14px 16px; font-size: 0.85rem; color: rgba(255,248,238,0.8);
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      vertical-align: middle;
+    }
+    .admin-table tr:last-child td { border-bottom: none; }
+    .admin-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .td-main { font-weight: 700; color: var(--cream); }
+    .td-muted { color: rgba(255,248,238,0.3); font-size: 0.78rem; }
+
+    /* VIBE BADGE */
+    .vibe-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.5px;
+    }
+    .vb-chill { background: rgba(10,61,61,0.5); color: #5eead4; }
+    .vb-concert { background: rgba(99,102,241,0.2); color: #a5b4fc; }
+    .vb-food { background: rgba(245,158,11,0.2); color: #fcd34d; }
+    .vb-study { background: rgba(34,197,94,0.15); color: #86efac; }
+    .vb-sports { background: rgba(255,107,26,0.15); color: var(--saffron); }
+    .vb-night { background: rgba(255,45,107,0.15); color: #fb7185; }
+
+    /* ACTION BTNS */
+    .tbl-btn {
+      padding: 5px 12px; border: 1px solid rgba(255,255,255,0.1);
+      background: none; font-family: 'Syne', sans-serif; font-size: 0.72rem;
+      font-weight: 700; cursor: pointer; color: rgba(255,248,238,0.5);
+      transition: all 0.15s; letter-spacing: 0.5px;
+    }
+    .tbl-btn:hover { border-color: var(--saffron); color: var(--saffron); }
+    .tbl-btn.danger:hover { border-color: var(--hot-pink); color: var(--hot-pink); }
+    .tbl-btn.success { border-color: #22c55e; color: #22c55e; }
+
+    /* WAITLIST */
+    .waitlist-item {
+      display: flex; align-items: center; padding: 12px 16px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .waitlist-item:last-child { border-bottom: none; }
+    .wl-num { font-size: 0.75rem; color: rgba(255,248,238,0.2); min-width: 40px; }
+    .wl-email { font-size: 0.88rem; color: var(--cream); flex: 1; }
+    .wl-time { font-size: 0.72rem; color: rgba(255,248,238,0.3); }
+
+    /* CHART BARS */
+    .chart-wrap { background: #161b22; border: 1px solid rgba(255,255,255,0.08); padding: 24px; margin-bottom: 24px; }
+    .chart-title { font-size: 0.72rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: rgba(255,248,238,0.3); margin-bottom: 20px; }
+    .bar-chart { display: flex; align-items: flex-end; gap: 12px; height: 120px; }
+    .bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .bar-fill { width: 100%; background: var(--saffron); opacity: 0.8; transition: opacity 0.15s; border-radius: 2px 2px 0 0; }
+    .bar-fill:hover { opacity: 1; }
+    .bar-label { font-size: 0.65rem; font-weight: 700; color: rgba(255,248,238,0.3); letter-spacing: 1px; }
+    .bar-val { font-family: 'Bebas Neue', sans-serif; font-size: 1rem; color: var(--cream); }
+
+    /* ACTIVITY FEED */
+    .activity-log { background: #161b22; border: 1px solid rgba(255,255,255,0.08); }
+    .log-item { display: flex; gap: 14px; padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.04); align-items: center; }
+    .log-item:last-child { border-bottom: none; }
+    .log-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .log-dot.green { background: #22c55e; }
+    .log-dot.orange { background: var(--saffron); }
+    .log-dot.pink { background: var(--hot-pink); }
+    .log-text { font-size: 0.82rem; color: rgba(255,248,238,0.7); flex: 1; }
+    .log-time { font-size: 0.7rem; color: rgba(255,248,238,0.2); font-family: 'JetBrains Mono', monospace; white-space: nowrap; }
+
+    /* DELETE CONFIRM */
+    .confirm-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+      z-index: 900; display: none; align-items: center; justify-content: center;
+    }
+    .confirm-overlay.open { display: flex; }
+    .confirm-box { background: #161b22; border: 1px solid rgba(255,255,255,0.1); padding: 32px; width: 400px; max-width: 95vw; }
+    .confirm-title { font-family: 'Bebas Neue', sans-serif; font-size: 1.6rem; color: var(--cream); margin-bottom: 12px; }
+    .confirm-text { font-size: 0.9rem; color: rgba(255,248,238,0.6); line-height: 1.6; margin-bottom: 24px; }
+    .confirm-actions { display: flex; gap: 12px; }
+    .confirm-delete { background: var(--hot-pink); color: white; border: none; padding: 12px 24px; font-family: 'Syne', sans-serif; font-weight: 800; cursor: pointer; flex: 1; }
+    .confirm-cancel { background: none; border: 1px solid rgba(255,255,255,0.15); color: rgba(255,248,238,0.6); padding: 12px 24px; font-family: 'Syne', sans-serif; font-weight: 700; cursor: pointer; flex: 1; }
+
+    /* SEARCH */
+    .search-input {
+      background: #161b22; border: 1px solid rgba(255,255,255,0.1); color: var(--cream);
+      padding: 9px 16px; font-family: 'Syne', sans-serif; font-size: 0.85rem;
+      outline: none; transition: border-color 0.2s; width: 260px;
+    }
+    .search-input:focus { border-color: var(--saffron); }
+    .search-input::placeholder { color: rgba(255,248,238,0.2); }
+
+    /* EXPORT BTN */
+    .export-btn {
+      background: rgba(255,107,26,0.1); border: 1px solid rgba(255,107,26,0.3);
+      color: var(--saffron); padding: 8px 18px; font-family: 'Syne', sans-serif;
+      font-weight: 700; font-size: 0.82rem; cursor: pointer; transition: all 0.15s; letter-spacing: 0.5px;
+    }
+    .export-btn:hover { background: var(--saffron); color: white; border-color: var(--saffron); }
+
+    /* RESPONSIVE */
+    @media(max-width:800px) {
+      .admin-layout { grid-template-columns: 1fr; }
+      .admin-sidebar { display: none; }
+      .stats-grid { grid-template-columns: repeat(2,1fr); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ADMIN NAV -->
+  <nav class="admin-nav">
+    <div>
+      <span class="admin-logo">Add<span>a</span></span>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <a href="feed.html" class="back-to-site">← Back to Site</a>
+  </nav>
+
+  <div class="admin-layout">
+
+    <!-- SIDEBAR -->
+    <aside class="admin-sidebar">
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Overview</span>
+        <button class="sidebar-btn active" onclick="showSection('dashboard', this)">
+          <span class="icon">📊</span> Dashboard
+        </button>
+        <button class="sidebar-btn" onclick="showSection('activity', this)">
+          <span class="icon">⚡</span> Live Activity
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Content</span>
+        <button class="sidebar-btn" onclick="showSection('scenes', this)">
+          <span class="icon">🔥</span> All Scenes
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Users</span>
+        <button class="sidebar-btn" onclick="showSection('waitlist', this)">
+          <span class="icon">📋</span> Waitlist
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <span class="sidebar-section-label">Tools</span>
+        <button class="sidebar-btn" onclick="clearAllData()">
+          <span class="icon">🗑</span> Clear All Data
+        </button>
+        <button class="sidebar-btn" onclick="exportData()">
+          <span class="icon">⬇</span> Export Data
+        </button>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="admin-main">
+
+      <!-- DASHBOARD -->
+      <div class="admin-section active" id="sec-dashboard">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Dashboard</div>
+            <div class="section-subtitle" id="dashSubtitle">Loading...</div>
+          </div>
+          <button class="export-btn" onclick="exportData()">⬇ Export CSV</button>
+        </div>
+
+        <div class="stats-grid" id="statsGrid"></div>
+
+        <!-- VIBE CHART -->
+        <div class="chart-wrap">
+          <div class="chart-title">Scenes by Vibe</div>
+          <div class="bar-chart" id="vibeChart"></div>
+        </div>
+
+        <!-- AREA CHART -->
+        <div class="chart-wrap">
+          <div class="chart-title">Top Areas</div>
+          <div class="bar-chart" id="areaChart"></div>
+        </div>
+      </div>
+
+      <!-- LIVE ACTIVITY -->
+      <div class="admin-section" id="sec-activity">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Live Activity</div>
+            <div class="section-subtitle">Real-time feed of everything happening</div>
+          </div>
+        </div>
+        <div class="activity-log" id="activityLog"></div>
+      </div>
+
+      <!-- ALL SCENES -->
+      <div class="admin-section" id="sec-scenes">
+        <div class="section-header">
+          <div>
+            <div class="section-title">All Scenes</div>
+            <div class="section-subtitle" id="scenesSubtitle"></div>
+          </div>
+          <input class="search-input" placeholder="Search scenes..." id="sceneSearch" oninput="renderScenes()" />
+        </div>
+        <div class="admin-table-wrap">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>Scene</th>
+                <th>Poster</th>
+                <th>Vibe</th>
+                <th>Area</th>
+                <th>Down</th>
+                <th>When</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="scenesTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- WAITLIST -->
+      <div class="admin-section" id="sec-waitlist">
+        <div class="section-header">
+          <div>
+            <div class="section-title">Waitlist</div>
+            <div class="section-subtitle" id="waitlistSubtitle"></div>
+          </div>
+          <button class="export-btn" onclick="exportWaitlist()">⬇ Export Emails</button>
+        </div>
+        <div class="admin-table-wrap" id="waitlistContainer"></div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- DELETE CONFIRM -->
+  <div class="confirm-overlay" id="confirmOverlay">
+    <div class="confirm-box">
+      <div class="confirm-title">Scene Delete Karna Hai?</div>
+      <p class="confirm-text" id="confirmText">Yeh action undo nahi hogi.</p>
+      <div class="confirm-actions">
+        <button class="confirm-delete" id="confirmYes">Haan, Delete Karo</button>
+        <button class="confirm-cancel" onclick="closeConfirm()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+  <script src="js/app.js"></script>
+  <script>
+    // =====================
+    // NAVIGATION
+    // =====================
+    function showSection(name, btn) {
+      document.querySelectorAll('.admin-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('sec-' + name).classList.add('active');
+      btn.classList.add('active');
+      if (name === 'scenes') renderScenes();
+      if (name === 'waitlist') renderWaitlist();
+      if (name === 'activity') renderActivity();
+    }
+
+    // =====================
+    // DASHBOARD
+    // =====================
+    function renderDashboard() {
+      const scenes = DB.getScenes();
+      const waitlist = DB.getWaitlist();
+      const totalDowns = scenes.reduce((a, s) => a + s.downCount, 0);
+      const activeScenes = scenes.filter(s => Utils.expiryPct(s.timestamp) > 0).length;
+
+      document.getElementById('dashSubtitle').textContent =
+        `Last updated: ${new Date().toLocaleTimeString()} · ${scenes.length} total scenes`;
+
+      // Stats
+      document.getElementById('statsGrid').innerHTML = `
+        <div class="stat-card">
+          <span class="stat-card-num" style="color:var(--saffron)">${scenes.length}</span>
+          <span class="stat-card-label">Total Scenes</span>
+          <div class="stat-card-change change-up">↑ ${activeScenes} active</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-num" style="color:#22c55e">${totalDowns}</span>
+          <span class="stat-card-label">Total Downs</span>
+          <div class="stat-card-change change-up">↑ Engagement rate: ${scenes.length ? Math.round(totalDowns/scenes.length*10)/10 : 0}/scene</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-num" style="color:#a5b4fc">${waitlist.length}</span>
+          <span class="stat-card-label">Waitlist Signups</span>
+          <div class="stat-card-change change-up">${waitlist.length > 0 ? `Latest: ${timeAgoShort(waitlist[waitlist.length-1]?.timestamp)}` : 'None yet'}</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-card-num" style="color:var(--soft-yellow)">${activeScenes}</span>
+          <span class="stat-card-label">Active Scenes</span>
+          <div class="stat-card-change">${scenes.length - activeScenes} expired</div>
+        </div>
+      `;
+
+      // Vibe chart
+      const vibeCounts = {};
+      Object.keys(VIBES).forEach(v => vibeCounts[v] = 0);
+      scenes.forEach(s => { if (vibeCounts[s.vibe] !== undefined) vibeCounts[s.vibe]++; });
+      const maxVibe = Math.max(...Object.values(vibeCounts), 1);
+
+      document.getElementById('vibeChart').innerHTML = Object.entries(vibeCounts).map(([vibe, count]) => `
+        <div class="bar-col">
+          <span class="bar-val">${count}</span>
+          <div class="bar-fill" style="height:${Math.max(4, (count/maxVibe)*100)}px;background:var(--saffron);" title="${vibe}: ${count}"></div>
+          <span class="bar-label">${VIBES[vibe].emoji}</span>
+        </div>
+      `).join('');
+
+      // Area chart
+      const areaCounts = {};
+      scenes.forEach(s => { areaCounts[s.area] = (areaCounts[s.area] || 0) + 1; });
+      const topAreas = Object.entries(areaCounts).sort((a,b) => b[1]-a[1]).slice(0, 7);
+      const maxArea = Math.max(...topAreas.map(a => a[1]), 1);
+
+      document.getElementById('areaChart').innerHTML = topAreas.map(([area, count]) => `
+        <div class="bar-col">
+          <span class="bar-val">${count}</span>
+          <div class="bar-fill" style="height:${Math.max(4, (count/maxArea)*100)}px;background:#0A3D3D;" title="${area}: ${count}"></div>
+          <span class="bar-label" style="font-size:0.55rem;text-align:center;">${area.split(' ')[0]}</span>
+        </div>
+      `).join('');
+    }
+
+    // =====================
+    // SCENES TABLE
+    // =====================
+    function renderScenes() {
+      const scenes = DB.getScenes();
+      const query = (document.getElementById('sceneSearch')?.value || '').toLowerCase();
+      const filtered = query ? scenes.filter(s =>
+        s.text.toLowerCase().includes(query) ||
+        s.name.toLowerCase().includes(query) ||
+        s.college.toLowerCase().includes(query) ||
+        s.area.toLowerCase().includes(query)
+      ) : scenes;
+
+      document.getElementById('scenesSubtitle').textContent = `${filtered.length} scenes${query ? ' (filtered)' : ''}`;
+
+      document.getElementById('scenesTableBody').innerHTML = filtered
+        .sort((a,b) => b.timestamp - a.timestamp)
+        .map(s => `
+          <tr>
+            <td>
+              <div class="td-main" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${s.text}">${s.text}</div>
+              <div class="td-muted">${Utils.timeAgo(s.timestamp)} · ${s.id.startsWith('seed') ? '🌱 seeded' : '👤 real'}</div>
+            </td>
+            <td>
+              <div class="td-main">${s.name}</div>
+              <div class="td-muted">${s.college}</div>
+            </td>
+            <td><span class="vibe-badge vb-${s.vibe}">${VIBES[s.vibe]?.emoji || '🔥'} ${VIBES[s.vibe]?.label || s.vibe}</span></td>
+            <td><span style="font-size:0.85rem;">📍 ${s.area}</span></td>
+            <td><span style="font-family:'Bebas Neue',sans-serif;font-size:1.2rem;color:var(--saffron);">${s.downCount}</span></td>
+            <td><span style="font-size:0.78rem;color:rgba(255,248,238,0.5);">${s.when}</span></td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a href="scene.html?id=${s.id}" target="_blank">
+                  <button class="tbl-btn">View</button>
+                </a>
+                <button class="tbl-btn danger" onclick="confirmDelete('${s.id}', '${s.text.slice(0,40).replace(/'/g,"\\'")}...')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('') || '<tr><td colspan="7" style="text-align:center;padding:32px;color:rgba(255,248,238,0.2);">Koi scene nahi</td></tr>';
+    }
+
+    // =====================
+    // WAITLIST
+    // =====================
+    function renderWaitlist() {
+      const list = DB.getWaitlist();
+      document.getElementById('waitlistSubtitle').textContent = `${list.length} signups`;
+      const container = document.getElementById('waitlistContainer');
+
+      if (list.length === 0) {
+        container.innerHTML = `<div style="padding:48px;text-align:center;color:rgba(255,248,238,0.2);font-size:0.9rem;">No signups yet. Share the landing page!</div>`;
+        return;
+      }
+      container.innerHTML = list.slice().reverse().map((item, i) => `
+        <div class="waitlist-item">
+          <span class="wl-num">#${list.length - i}</span>
+          <span class="wl-email">${item.email}</span>
+          <span class="wl-time">${Utils.timeAgo(item.timestamp)}</span>
+        </div>
+      `).join('');
+    }
+
+    // =====================
+    // LIVE ACTIVITY
+    // =====================
+    function renderActivity() {
+      const scenes = DB.getScenes();
+      const logs = [];
+
+      scenes.forEach(s => {
+        logs.push({ dot:'orange', text:`Scene posted by <strong>${s.name}</strong> (${s.college}): "${s.text.slice(0,60)}..."`, time: s.timestamp });
+        if (s.downCount > 0) {
+          logs.push({ dot:'green', text:`<strong>${s.downCount} people</strong> went down for "${s.text.slice(0,40)}..."`, time: s.timestamp + 300000 });
+        }
+        (s.messages || []).forEach(m => {
+          logs.push({ dot:'green', text:`<strong>${m.name}</strong> sent a message in scene chat`, time: m.timestamp });
+        });
+      });
+
+      const waitlist = DB.getWaitlist();
+      waitlist.forEach(w => {
+        logs.push({ dot:'pink', text:`New waitlist signup: <strong>${w.email}</strong>`, time: w.timestamp });
+      });
+
+      logs.sort((a,b) => b.time - a.time);
+
+      document.getElementById('activityLog').innerHTML = logs.slice(0, 30).map(l => `
+        <div class="log-item">
+          <div class="log-dot ${l.dot}"></div>
+          <div class="log-text">${l.text}</div>
+          <div class="log-time">${Utils.timeAgo(l.time)}</div>
+        </div>
+      `).join('') || '<div style="padding:32px;text-align:center;color:rgba(255,248,238,0.2);">No activity yet</div>';
+    }
+
+    // =====================
+    // DELETE
+    // =====================
+    let _deleteId = null;
+    function confirmDelete(id, preview) {
+      _deleteId = id;
+      document.getElementById('confirmText').textContent = `"${preview}" — permanently delete karein?`;
+      document.getElementById('confirmOverlay').classList.add('open');
+      document.getElementById('confirmYes').onclick = doDelete;
+    }
+    function doDelete() {
+      const scenes = DB.getScenes().filter(s => s.id !== _deleteId);
+      DB.saveScenes(scenes);
+      closeConfirm();
+      renderScenes();
+      renderDashboard();
+      showToast('Scene delete ho gaya', 'success');
+    }
+    function closeConfirm() { document.getElementById('confirmOverlay').classList.remove('open'); _deleteId = null; }
+
+    // =====================
+    // EXPORT
+    // =====================
+    function exportData() {
+      const scenes = DB.getScenes();
+      const csv = ['ID,Name,College,Vibe,Area,When,Down Count,Text,Timestamp',
+        ...scenes.map(s => `${s.id},"${s.name}","${s.college}",${s.vibe},"${s.area}","${s.when}",${s.downCount},"${s.text.replace(/"/g,"'")}",${new Date(s.timestamp).toISOString()}`)
+      ].join('\n');
+      download('adda_scenes.csv', csv);
+      showToast('Scenes exported!', 'success');
+    }
+
+    function exportWaitlist() {
+      const list = DB.getWaitlist();
+      const csv = ['Email,Timestamp', ...list.map(w => `${w.email},${new Date(w.timestamp).toISOString()}`)].join('\n');
+      download('adda_waitlist.csv', csv);
+      showToast('Waitlist exported!', 'success');
+    }
+
+    function download(filename, text) {
+      const a = document.createElement('a');
+      a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(text);
+      a.download = filename;
+      a.click();
+    }
+
+    function clearAllData() {
+      if (!confirm('SACH MEIN? Sab data delete ho jaayega. Confirm?')) return;
+      if (!confirm('Ekdum sure? Undo nahi hoga.')) return;
+      localStorage.removeItem('adda_scenes');
+      localStorage.removeItem('adda_user');
+      localStorage.removeItem('adda_notifs');
+      localStorage.removeItem('adda_waitlist');
+      showToast('Sab clear ho gaya', 'success');
+      setTimeout(() => location.reload(), 800);
+    }
+
+    function timeAgoShort(ts) {
+      if (!ts) return 'N/A';
+      const mins = Math.floor((Date.now()-ts)/60000);
+      if (mins < 60) return `${mins}m ago`;
+      return `${Math.floor(mins/60)}h ago`;
+    }
+
+    // =====================
+    // INIT
+    // =====================
+    renderDashboard();
+
+    // Auto-refresh dashboard every 30s
+    setInterval(() => {
+      if (document.getElementById('sec-dashboard').classList.contains('active')) renderDashboard();
+    }, 30000);
+  </script>
+</body>
+</html>
